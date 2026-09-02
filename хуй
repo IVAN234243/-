@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+    <title>Политика конфиденциальности</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #2c3e50;
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+        }
+        /* Бегающий блок */
+        #movingBox {
+            position: fixed;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            background: #ecf0f1;
+            padding: 20px 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            user-select: none;
+            -webkit-touch-callout: none;
+            transition: left 0.2s ease, top 0.2s ease;
+            z-index: 1000;
+            white-space: nowrap;
+        }
+        #movingBox input[type="checkbox"] {
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            pointer-events: none;   /* клик идёт на блок */
+        }
+        #movingBox label {
+            font-size: 22px;
+            font-weight: bold;
+            color: #2c3e50;
+            cursor: pointer;
+        }
+        @media (max-width: 600px) {
+            #movingBox {
+                padding: 15px 20px;
+            }
+            #movingBox label {
+                font-size: 18px;
+            }
+        }
+
+        /* Модальное окно (overlay + контент) */
+        #modalOverlay {
+            display: none; /* скрыто по умолчанию */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.3s ease;
+        }
+        #modalOverlay.active {
+            display: flex;
+        }
+        #modalBox {
+            background: #fff;
+            padding: 40px 60px;
+            border-radius: 24px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+            animation: bounceIn 0.5s ease;
+            max-width: 90vw;
+        }
+        #modalBox h2 {
+            font-size: 48px;
+            color: #e74c3c;
+            margin-bottom: 30px;
+            letter-spacing: 2px;
+        }
+        #modalBox button {
+            background: #2c3e50;
+            border: none;
+            color: #fff;
+            font-size: 24px;
+            font-weight: bold;
+            padding: 12px 40px;
+            border-radius: 40px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        #modalBox button:hover {
+            background: #1a252f;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to   { opacity: 1; }
+        }
+        @keyframes bounceIn {
+            0%   { transform: scale(0.7); opacity: 0; }
+            60%  { transform: scale(1.05); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        @media (max-width: 500px) {
+            #modalBox {
+                padding: 30px 20px;
+            }
+            #modalBox h2 {
+                font-size: 36px;
+            }
+            #modalBox button {
+                font-size: 20px;
+                padding: 10px 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="movingBox">
+        <input type="checkbox" id="agree" />
+        <label for="agree">Политика конфидециональности</label>
+    </div>
+
+    <!-- Модальное окно -->
+    <div id="modalOverlay">
+        <div id="modalBox">
+            <h2>хуй тебе</h2>
+            <button id="modalOkBtn">ОК</button>
+        </div>
+    </div>
+
+    <script>
+        const box = document.getElementById('movingBox');
+        const modalOverlay = document.getElementById('modalOverlay');
+        const modalOkBtn = document.getElementById('modalOkBtn');
+        let isMoving = false;
+
+        function showModal() {
+            modalOverlay.classList.add('active');
+        }
+
+        function hideModal() {
+            modalOverlay.classList.remove('active');
+        }
+
+        function moveAway(e) {
+            e.preventDefault(); // отменяем переключение чекбокса
+            if (isMoving) return;
+            isMoving = true;
+
+            const rect = box.getBoundingClientRect();
+            const boxWidth = rect.width;
+            const boxHeight = rect.height;
+
+            const maxX = window.innerWidth - boxWidth;
+            const maxY = window.innerHeight - boxHeight;
+
+            const newX = Math.random() * maxX;
+            const newY = Math.random() * maxY;
+
+            box.style.left = newX + 'px';
+            box.style.top = newY + 'px';
+            box.style.transform = 'none';
+
+            // Показываем модальное окно через 300 мс
+            setTimeout(() => {
+                showModal();
+                isMoving = false;
+            }, 300);
+        }
+
+        // Обработчик для касания / клика
+        box.addEventListener('pointerdown', moveAway);
+
+        // Резервный клик (на случай, если pointerdown не сработает)
+        box.addEventListener('click', function(e) {
+            if (!isMoving) {
+                moveAway(e);
+            }
+        });
+
+        // Закрытие модалки по кнопке
+        modalOkBtn.addEventListener('click', hideModal);
+
+        // Закрытие по клику на фон (overlay)
+        modalOverlay.addEventListener('click', function(e) {
+            if (e.target === modalOverlay) {
+                hideModal();
+            }
+        });
+    </script>
+</body>
+</html>
